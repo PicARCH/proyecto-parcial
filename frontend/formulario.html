@@ -16,8 +16,12 @@
 
     <label for="mensaje">Mensaje:</label><br>
     <textarea id="mensaje" name="mensaje" rows="4" cols="50" required></textarea><br><br>
+    <div>
+      <button type="submit">Enviar</button>
+      <button type="reset">Limpiar</button>  
+    </div>
+    
 
-    <button type="submit">Enviar</button>
   </form>
 
   <p id="respuesta"></p>
@@ -31,6 +35,12 @@
         email: document.getElementById('email').value,
         mensaje: document.getElementById('mensaje').value
       };
+
+    document.getElementById("contactForm").addEventListener("submit", function(event) {
+      event.preventDefault(); // evita el envío real si no quieres recargar
+      document.getElementById("contactForm").reset(); // borra los campos
+      document.getElementById("respuesta").textContent = "Formulario enviado. ¡Gracias!";
+    });
 
       fetch('http://localhost:3000/api/contacto', {
         method: 'POST',
