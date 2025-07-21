@@ -36,11 +36,7 @@
         mensaje: document.getElementById('mensaje').value
       };
 
-    document.getElementById("contactForm").addEventListener("submit", function(event) {
-      event.preventDefault(); // evita el envío real si no quieres recargar
-      document.getElementById("contactForm").reset(); // borra los campos
-      document.getElementById("respuesta").textContent = "Formulario enviado. ¡Gracias!";
-    });
+    
 
       fetch('http://localhost:3000/api/contacto', {
         method: 'POST',
