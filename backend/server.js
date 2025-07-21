@@ -38,7 +38,7 @@ const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
+    // Cuando el navegador no quiere enviar datos todavía
     if (req.method === 'OPTIONS') {
         res.writeHead(204);
         res.end();
@@ -46,23 +46,25 @@ const server = http.createServer((req, res) => {
     }
 
     // 4. Manejo de rutas
+    //si alguien visita la página principal (/) 
     if (req.method === 'GET' && req.url === '/') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ mensaje: 'Servidor funcionando' }));
     }
+    //recibiendo datos del formulario
     else if (req.method === 'POST' && req.url === '/api/contacto') {
+        // Se va juntando toda la información que llega.
         let body = '';
-
         req.on('data', chunk => {
             body += chunk.toString();
         });
-
+        // Cuando termina de llegar todo, se convierte en un objeto de JavaScript
         req.on('end', () => {
             try {
                 const data = JSON.parse(body);
                 console.log('Datos recibidos:', data);
 
-                // Insertar en MySQL
+                // Guardar los datos en la base de datos
                 connection.query(
                     'INSERT INTO contactos (nombre, email, mensaje) VALUES (?, ?, ?)',
                     [data.nombre, data.email, data.mensaje],
