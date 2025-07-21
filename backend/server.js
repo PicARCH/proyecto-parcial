@@ -89,6 +89,79 @@ const server = http.createServer((req, res) => {
             }
         });
     }
+    // Actualizar un contacto existente (PUT)
+    else if (req.method === 'PUT' && req.url.startsWith('/api/contacto/')) {
+        const id = req.url.split('/')[3];
+        
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+        
+        req.on('end', () => {
+            try {
+                const data = JSON.parse(body);
+                
+                connection.query(
+                    'UPDATE contactos SET nombre = ?, email = ?, mensaje = ? WHERE id = ?',
+                    [data.nombre, data.email, data.mensaje, id],
+                    (err, results) => {
+                        if (err) {
+                            console.error('Error en MySQL:', err);
+                            res.writeHead(500, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ error: 'Error al actualizar en DB' }));
+                            return;
+                        }
+                        
+                        if (results.affectedRows === 0) {
+                            res.writeHead(404, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ error: 'Contacto no encontrado' }));
+                            return;
+                        }
+                        
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({
+                            mensaje: 'Contacto actualizado',
+                            id: id
+                        }));
+                    }
+                );
+            } catch (error) {
+                res.writeHead(400, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Datos inválidos' }));
+            }
+        });
+    }
+    // Eliminar un contacto (DELETE)
+    else if (req.method === 'DELETE' && req.url.startsWith('/api/contacto/')) {
+        const id = req.url.split('/')[3];
+        
+        connection.query(
+            'DELETE FROM contactos WHERE id = ?',
+            [id],
+            (err, results) => {
+                if (err) {
+                    console.error('Error en MySQL:', err);
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Error al eliminar de DB' }));
+                    return;
+                }
+                
+                if (results.affectedRows === 0) {
+                    res.writeHead(404, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ error: 'Contacto no encontrado' }));
+                    return;
+                }
+                
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({
+                    mensaje: 'Contacto eliminado',
+                    id: id
+                }));
+            }
+        );
+    }
+    
     else {
         res.writeHead(404, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: 'Ruta no encontrada' }));
