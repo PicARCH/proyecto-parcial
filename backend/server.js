@@ -48,8 +48,20 @@ const server = http.createServer((req, res) => {
     // 4. Manejo de rutas
     //si alguien visita la página principal (/) 
     if (req.method === 'GET' && req.url === '/') {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.writeHead(200, { 'Content-Type': 'application/json' });//http://localhost:3000
         res.end(JSON.stringify({ mensaje: 'Servidor funcionando' }));
+    }
+    else if (req.method === 'GET' && req.url === '/api/contacto') {// http://localhost:3000/api/contacto
+        connection.query('SELECT * FROM contactos', (err, results) => {
+            if (err) {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Error al leer datos de la base' }));
+                return;
+            }
+    
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(results));
+        });
     }
     //recibiendo datos del formulario
     else if (req.method === 'POST' && req.url === '/api/contacto') {
